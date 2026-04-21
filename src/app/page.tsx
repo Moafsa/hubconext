@@ -27,6 +27,9 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-8">
              <a href="#features" className="text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors">Funcionalidades</a>
              <a href="#white-label" className="text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors">White-Label</a>
+             <Link href="/register" className="text-sm font-black text-blue-600 hover:text-blue-700 transition-all">
+                Cadastrar Agência
+             </Link>
              <Link href="/login" className="px-5 py-2 rounded-full bg-slate-900 text-white text-sm font-black hover:bg-black transition-all shadow-lg shadow-slate-900/10">
                 Acessar Painel
              </Link>
