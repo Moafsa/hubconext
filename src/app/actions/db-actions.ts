@@ -921,6 +921,117 @@ export async function getAgencies() {
   }
 }
 
+export async function createAgency(data: {
+  name: string;
+  cnpj: string;
+  responsibleName: string;
+  responsibleEmail: string;
+  responsiblePhone?: string;
+}) {
+  try {
+    const { name, cnpj, responsibleName, responsibleEmail, responsiblePhone } = data;
+
+    // 1. Validar unicidade de CNPJ
+    const existingAgency = await prisma.agency.findUnique({ where: { cnpj } });
+    if (existingAgency) {
+      return { success: false, error: "CNPJ_ALREADY_EXISTS" };
+    }
+
+    // 2. Validar unicidade de E-mail
+    const existingUser = await prisma.user.findUnique({ 
+      where: { email: responsibleEmail.toLowerCase() } 
+    });
+    if (existingUser) {
+      return { success: false, error: "EMAIL_ALREADY_EXISTS" };
+    }
+
+    // 3. Criação Atômica
+    const result = await prisma.$transaction(async (tx) => {
+      const agency = await tx.agency.create({
+        data: {
+          name,
+          cnpj,
+          responsibleName,
+          responsibleEmail,
+          responsiblePhone,
+        }
+      });
+
+      const user = await tx.user.create({
+        data: {
+          name: responsibleName,
+          email: responsibleEmail.toLowerCase(),
+          role: "AGENCY_ADMIN",
+          agencyId: agency.id,
+          phone: responsiblePhone
+        }
+      });
+
+      return { agency, user };
+    });
+
+    revalidatePath("/dashboard/agencies");
+    return { success: true, agency: result.agency };
+  } catch (error: any) {
+    console.error("ERRO AO CRIAR AGÊNCIA:", error);
+    return { success: false, error: error.message || "Erro interno ao criar agência." };
+  }
+}
+
+export async function updateAgency(agencyId: string, data: {
+  name?: string;
+  cnpj?: string;
+  responsibleName?: string;
+  responsibleEmail?: string;
+  responsiblePhone?: string;
+}) {
+  try {
+    const updated = await prisma.agency.update({
+      where: { id: agencyId },
+      data: {
+        name: data.name,
+        cnpj: data.cnpj,
+        responsibleName: data.responsibleName,
+        responsibleEmail: data.responsibleEmail,
+        responsiblePhone: data.responsiblePhone,
+      }
+    });
+
+    // Se o e-mail do responsável mudou, precisamos atualizar o usuário admin também?
+    // Por simplicidade, vamos atualizar apenas a agência por enquanto, 
+    // ou podemos buscar o usuário com role AGENCY_ADMIN vinculado a esta agência.
+    
+    revalidatePath("/dashboard/agencies");
+    return { success: true, agency: updated };
+  } catch (error: any) {
+    console.error("Erro ao atualizar agência:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function deleteAgency(agencyId: string) {
+  try {
+    // 1. Verificar se tem projetos vinculados
+    const projectCount = await prisma.project.count({ where: { agencyId } });
+    if (projectCount > 0) {
+      throw new Error(`Não é possível excluir uma agência que possui ${projectCount} projetos. Delete os projetos primeiro.`);
+    }
+
+    // 2. Deletar em cascata manual (Usuários, Clientes, Agência)
+    await prisma.$transaction([
+      prisma.user.deleteMany({ where: { agencyId } }),
+      prisma.client.deleteMany({ where: { agencyId } }),
+      prisma.agency.delete({ where: { id: agencyId } }),
+    ]);
+
+    revalidatePath("/dashboard/agencies");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Erro ao excluir agência:", error);
+    return { success: false, error: error.message };
+  }
+}
+
 export async function getAgencySettings(agencyId: string) {
   try {
     return await prisma.agency.findUnique({

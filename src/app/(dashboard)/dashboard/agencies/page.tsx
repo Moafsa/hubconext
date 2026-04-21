@@ -10,6 +10,8 @@ import {
   Shield
 } from "lucide-react";
 import { redirect } from "next/navigation";
+import AddAgencyButton from "@/components/Dashboard/Agencies/AddAgencyButton";
+import AgencyActions from "@/components/Dashboard/Agencies/AgencyActions";
 
 export default async function AgenciesPage() {
   const session = await getServerSession(authOptions);
@@ -29,21 +31,18 @@ export default async function AgenciesPage() {
           <p className="text-slate-500 font-medium">Controle o acesso e visualize a performance de cada parceiro.</p>
         </div>
         
-        <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-500/20">
-          <Plus className="w-5 h-5" />
-          Cadastrar Agência
-        </button>
+        <AddAgencyButton />
       </div>
 
       {/* Agencies Table/List */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50/50 border-b border-slate-100">
               <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Agência</th>
               <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Projetos</th>
               <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Status Asaas</th>
-              <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Ações</th>
+              <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -79,10 +78,8 @@ export default async function AgenciesPage() {
                       )}
                    </div>
                 </td>
-                <td className="px-6 py-5">
-                   <button className="p-2 text-slate-400 hover:text-slate-600 transition-all rounded-lg hover:bg-white border border-transparent hover:border-slate-200">
-                      <MoreHorizontal className="w-5 h-5" />
-                   </button>
+                <td className="px-6 py-5 text-right">
+                   <AgencyActions agency={agency} />
                 </td>
               </tr>
             ))}
