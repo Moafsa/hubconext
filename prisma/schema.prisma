@@ -1,0 +1,205 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Agency {
+  id               String    @id @default(cuid())
+  name             String
+  cnpj             String    @unique
+  asaasCustomerId  String?
+  logoUrl          String?
+  primaryColor     String?   @default("#000000")
+  customDomain     String?
+  smtpHost         String?
+  smtpPass         String?
+  smtpPort         Int?
+  smtpUser         String?
+  uzapiInstanceId  String?
+  uzapiToken       String?
+  smtpFrom         String?
+  addressCity      String?
+  addressDistrict  String?
+  addressLine      String?
+  addressState     String?
+  addressZip       String?
+  legalName        String?
+  phone            String?
+  responsibleEmail String?
+  responsibleName  String?
+  responsiblePhone String?
+  clients          Client[]
+  projects         Project[]
+  users            User[]
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String
+  role      Role      @default(AGENCY_USER)
+  agencyId  String?
+  position  String?
+  isBlocked Boolean   @default(false)
+  phone     String?
+  comments  Comment[]
+  agency    Agency?   @relation(fields: [agencyId], references: [id])
+}
+
+model DashboardLoginCode {
+  id         String    @id @default(cuid())
+  email      String
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  attempts   Int       @default(0)
+  createdAt  DateTime  @default(now())
+
+  @@index([email])
+  @@index([expiresAt])
+}
+
+model Client {
+  id           String    @id @default(cuid())
+  name         String
+  email        String
+  whatsapp     String?
+  agencyId     String
+  otpCode      String?
+  otpExpiresAt DateTime?
+  agency       Agency    @relation(fields: [agencyId], references: [id])
+  projects     Project[]
+}
+
+model Project {
+  id              String            @id @default(cuid())
+  title           String
+  description     String
+  status          ProjectStatus     @default(DRAFT)
+  proposedPrice   Float?
+  agreedPrice     Float?
+  asaasInvoice1Id String?
+  asaasInvoice2Id String?
+  agencyId        String
+  clientId        String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  briefing        Json?
+  contractText    String?
+  credentials     String?
+  technicalScope  String?
+  type            ProjectType       @default(WEBSITE)
+  suggestedTech   String?
+  comments        Comment[]
+  files           File[]
+  payments        Payment[]
+  agency          Agency            @relation(fields: [agencyId], references: [id])
+  client          Client            @relation(fields: [clientId], references: [id])
+  histories       ProjectHistory[]
+  snapshots       ProjectSnapshot[]
+}
+
+model ProjectSnapshot {
+  id             String   @id @default(cuid())
+  technicalScope String?
+  contractText   String?
+  briefing       Json?
+  projectId      String
+  createdAt      DateTime @default(now())
+  project        Project  @relation(fields: [projectId], references: [id])
+}
+
+model Payment {
+  id        String    @id @default(cuid())
+  amount    Float
+  dueDate   DateTime
+  status    String    @default("PENDING")
+  asaasId   String?
+  paidAt    DateTime?
+  projectId String
+  createdAt DateTime  @default(now())
+  project   Project   @relation(fields: [projectId], references: [id])
+}
+
+model File {
+  id         String   @id @default(cuid())
+  filename   String
+  minioKey   String   @unique
+  fileType   String
+  sizeBytes  Int
+  projectId  String
+  uploadedAt DateTime @default(now())
+  project    Project  @relation(fields: [projectId], references: [id])
+}
+
+model Comment {
+  id                String   @id @default(cuid())
+  text              String
+  userId            String?
+  projectId         String
+  createdAt         DateTime @default(now())
+  isVisibleToClient Boolean  @default(false)
+  clientAuthorName  String?
+  project           Project  @relation(fields: [projectId], references: [id])
+  user              User?    @relation(fields: [userId], references: [id])
+}
+
+model ProjectHistory {
+  id        String   @id @default(cuid())
+  action    String
+  details   String?
+  projectId String
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id])
+}
+
+model SystemConfig {
+  id              String   @id @default("master")
+  platformName    String   @default("Conext Hub")
+  primaryColor    String   @default("#3b82f6")
+  logoUrl         String?
+  updatedAt       DateTime @updatedAt
+  openaiApiKey    String?
+
+  // Comunicação Global e Fallback
+  smtpHost        String?
+  smtpPort        Int?
+  smtpUser        String?
+  smtpPass        String?
+  smtpFrom        String?
+  uzapiInstanceId String?
+  uzapiToken      String?
+}
+
+enum Role {
+  CONEXT_ADMIN
+  AGENCY_USER
+  AGENCY_ADMIN
+}
+
+enum ProjectType {
+  WEBSITE
+  LANDING_PAGE
+  SYSTEM
+  AUTOMATION
+  LOGO
+  OTHER
+}
+
+enum ProjectStatus {
+  DRAFT
+  NEGOTIATING
+  WAITING_INITIAL_PAY
+  WAITING_BRIEFING
+  IN_DEVELOPMENT
+  TESTING
+  WAITING_FINAL_PAY
+  DELIVERED
+  CANCELED
+  UNDER_REVIEW
+  AWAITING_AGENCY_ACCEPTANCE
+}

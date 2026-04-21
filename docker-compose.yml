@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: conext_hub_db
+    environment:
+      POSTGRES_USER: conext
+      POSTGRES_PASSWORD: conextpassword
+      POSTGRES_DB: conext_hub
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    container_name: conext_hub_minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadminpassword
+      MINIO_API_CORS_ALLOW_ORIGIN: "*"
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+
+  wuzapi_db:
+    image: postgres:15-alpine
+    container_name: conext_hub_wuzapi_db
+    environment:
+      - POSTGRES_USER=wuzapi
+      - POSTGRES_PASSWORD=wuzapipassword
+      - POSTGRES_DB=wuzapi
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wuzapi -d wuzapi"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  wuzapi:
+    image: asternic/wuzapi:latest
+    container_name: conext_hub_wuzapi
+    environment:
+      - WUZAPI_ADMIN_TOKEN=master_token_conext
+      - WUZAPI_GLOBAL_ENCRYPTION_KEY=12345678901234567890123456789012
+      - DB_USER=wuzapi
+      - DB_PASSWORD=wuzapipassword
+      - DB_NAME=wuzapi
+      - DB_HOST=wuzapi_db
+      - DB_PORT=5432
+      - DB_SSLMODE=false
+    ports:
+      - "8080:8080"
+    depends_on:
+      wuzapi_db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  createbuckets:
+    image: minio/mc:latest
+    container_name: conext_hub_minio_init
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadminpassword;
+      /usr/bin/mc mb myminio/bucket-conext;
+      /usr/bin/mc anonymous set download myminio/bucket-conext;
+      exit 0;
+      "
+
+volumes:
+  postgres_data:
+  minio_data:
+  wuzapi_data:

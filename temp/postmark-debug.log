@@ -1,0 +1,65 @@
+[2026-04-18T20:53:15.639Z] Iniciando teste de conexão API Postmark {"to":"noreply@conext.click"}
+[2026-04-18T20:53:16.248Z] Resposta Postmark (Teste): {"status":200,"data":{"ErrorCode":0,"Message":"OK","MessageID":"7f791d6b-8264-41e1-817a-4be7a89e10ec","SubmittedAt":"2026-04-18T20:53:24.0092133Z","To":"noreply@conext.click"}}
+[2026-04-18T20:53:55.897Z] Enviando e-mail via API Postmark {"from":"noreply@conext.click","to":"financeiro@clinicasorriso.com.br","subject":"Seu Código de Acesso"}
+[2026-04-18T20:53:56.459Z] Resposta Postmark (Envio): {"status":200,"data":{"ErrorCode":0,"Message":"OK","MessageID":"19a8502b-0d4e-4f70-9c32-5a56a0db9919","SubmittedAt":"2026-04-18T20:54:04.2217594Z","To":"financeiro@clinicasorriso.com.br"}}
+[2026-04-18T21:20:15.912Z] Iniciando teste de conexão API Postmark {"to":"elonbettor@gmail.com"}
+[2026-04-18T21:20:16.494Z] Resposta Postmark (Teste): {"status":401,"data":{"ErrorCode":10,"Message":"Request does not contain a valid Server token."}}
+[2026-04-18T21:40:04.698Z] Iniciando teste de conexão API Postmark {"to":"contato@vigiliaawake.org"}
+[2026-04-18T21:40:05.224Z] Resposta Postmark (Teste): {"status":401,"data":{"ErrorCode":10,"Message":"Request does not contain a valid Server token."}}
+[2026-04-18T21:40:14.722Z] Iniciando teste de conexão API Postmark {"to":"contato@vigiliaawake.org"}
+[2026-04-18T21:40:15.249Z] Resposta Postmark (Teste): {"status":401,"data":{"ErrorCode":10,"Message":"Request does not contain a valid Server token."}}
+[2026-04-18T21:44:12.275Z] Iniciando envio híbrido {"host":"smtp.mailgun.org","to":"contato@vigiliaawake.org","provider":"Generic SMTP"}
+[2026-04-18T21:44:14.504Z] Falha SMTP: "Data command failed: 421 Domain vigiliaawake.org is not allowed to send: Please activate your Mailgun account. Check your inbox or log in to your control panel to resend the activation email."
+[2026-04-18T22:27:18.246Z] Iniciando envio híbrido {"host":"smtp.mailgun.org","to":"financeiro@clinicasorriso.com.br","provider":"Generic SMTP"}
+[2026-04-18T22:27:20.922Z] Falha SMTP: "Data command failed: 421 Domain vigiliaawake.org is not allowed to send: Please activate your Mailgun account. Check your inbox or log in to your control panel to resend the activation email."
+[2026-04-20T16:37:11.517Z] Iniciando envio híbrido {"host":"mail.thiga.com.br","to":"contato@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T16:37:11.807Z] Falha SMTP: "getaddrinfo ENOTFOUND mail.thiga.com.br"
+[2026-04-20T16:41:08.501Z] Iniciando envio híbrido {"host":"mail.thiga.com.br","to":"moa@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T16:41:08.521Z] Falha SMTP: "getaddrinfo ENOTFOUND mail.thiga.com.br"
+[2026-04-20T16:46:07.963Z] Iniciando envio híbrido {"host":"mail.thiga.com.br","to":"mendes@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T16:46:07.978Z] Falha SMTP: "getaddrinfo ENOTFOUND mail.thiga.com.br"
+[2026-04-20T16:46:18.146Z] Iniciando envio híbrido {"host":"mail.thiga.com.br","to":"mendes@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T16:46:18.158Z] Falha SMTP: "getaddrinfo ENOTFOUND mail.thiga.com.br"
+[2026-04-20T16:46:28.907Z] Iniciando envio híbrido {"host":"mail.thiga.com.br","to":"mendes@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T16:46:28.918Z] Falha SMTP: "getaddrinfo ENOTFOUND mail.thiga.com.br"
+[2026-04-20T16:52:26.330Z] Iniciando envio híbrido {"host":"thiga.com.br","to":"moa@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T16:52:47.404Z] Falha SMTP: "connect ETIMEDOUT 216.198.79.1:587"
+[2026-04-20T16:54:22.135Z] Iniciando envio híbrido {"host":"thiga.com.br","to":"moa@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T16:54:43.177Z] Falha SMTP: "connect ETIMEDOUT 216.198.79.1:465"
+[2026-04-20T17:01:25.981Z] Iniciando envio híbrido {"host":"www662.your-server.de","to":"moa@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T17:01:30.766Z] Falha SMTP: "Invalid login: 535 Incorrect authentication data"
+[2026-04-20T17:02:01.333Z] Iniciando envio híbrido {"host":"www662.your-server.de","to":"mendes@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T17:02:07.026Z] Sucesso SMTP: {"messageId":"<cd0ed7f0-9fa6-4514-a657-2926c7112fd4@thiga.com.br>","response":"250 OK id=1wEs0m-000AN6-0w"}
+[2026-04-20T17:07:44.653Z] Iniciando envio híbrido {"host":"www662.your-server.de","to":"moacir@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T17:07:50.911Z] Sucesso SMTP: {"messageId":"<f26005d3-64b8-80a0-2deb-61f234eaf123@thiga.com.br>","response":"250 OK id=1wEs6K-000B4Z-0i"}
+[2026-04-20T17:09:16.355Z] Iniciando envio híbrido {"host":"smtp.thiga.com.br","to":"moacir@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T17:09:16.372Z] Falha SMTP: "getaddrinfo ENOTFOUND smtp.thiga.com.br"
+[2026-04-20T17:24:00.002Z] Iniciando envio híbrido {"host":"smtp.thiga.com.br","to":"moacir@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T17:24:00.043Z] Falha SMTP: "getaddrinfo ENOTFOUND smtp.thiga.com.br"
+[2026-04-20T17:24:00.044Z] Buscando MX para sugestão: "thiga.com.br"
+[2026-04-20T17:24:00.047Z] Falha ao buscar MX para sugestão {"code":"ECONNREFUSED","syscall":"queryMx","hostname":"thiga.com.br"}
+[2026-04-20T17:25:07.456Z] Iniciando envio híbrido {"host":"smtp.thiga.com.br","to":"moacir@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T17:25:07.472Z] Falha SMTP: "getaddrinfo ENOTFOUND smtp.thiga.com.br"
+[2026-04-20T17:25:07.475Z] Buscando MX para sugestão: "thiga.com.br"
+[2026-04-20T17:26:48.263Z] Iniciando envio híbrido {"host":"smtp.thiga.com.br","to":"moacir@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T17:26:48.311Z] Falha SMTP: "getaddrinfo ENOTFOUND smtp.thiga.com.br"
+[2026-04-20T17:26:48.313Z] Buscando MX para sugestão: "thiga.com.br"
+[2026-04-20T17:26:50.353Z] Iniciando tentativa de correção automática de Host... 
+[2026-04-20T17:26:50.357Z] Buscando MX para sugestão: "thiga.com.br"
+[2026-04-20T17:26:50.435Z] Tentando fallback automático para: "www662.your-server.de"
+[2026-04-20T17:26:50.435Z] Iniciando envio híbrido {"host":"www662.your-server.de","to":"moacir@thiga.com.br","provider":"Generic SMTP"}
+[2026-04-20T17:26:56.554Z] Sucesso SMTP: {"messageId":"<8dd3c834-4e11-09bc-a38d-6c3b548b0214@thiga.com.br>","response":"250 OK id=1wEsOn-000EAd-2e"}
+[2026-04-20T17:32:20.932Z] Iniciando envio híbrido {"host":"www662.your-server.de","to":"moafsa@gmail.com","provider":"Generic SMTP"}
+[2026-04-20T17:32:26.517Z] Sucesso SMTP: {"messageId":"<ee4c5ec1-c634-24e4-a29d-1b47c36c5d4d@thiga.com.br>","response":"250 OK id=1wEsU7-000FTj-2a"}
+[2026-04-21T12:39:16.374Z] Iniciando envio híbrido {"host":"www662.your-server.de","to":"elonbettor@gmail.com","provider":"Generic SMTP"}
+[2026-04-21T12:39:22.748Z] Sucesso SMTP: {"messageId":"<8c17007f-42dc-9d98-ca24-7520ecc331fe@thiga.com.br>","response":"250 OK id=1wFAO4-0001eJ-2a"}
+[2026-04-21T17:03:59.168Z] Iniciando envio híbrido {"host":"www662.your-server.de","to":"elonbettors@gmail.com","provider":"Generic SMTP"}
+[2026-04-21T17:04:05.255Z] Sucesso SMTP: {"messageId":"<9335ca7e-8dbf-2890-2f2b-0a09743ad2eb@thiga.com.br>","response":"250 OK id=1wFEWF-000Anx-0D"}
+[2026-04-21T19:29:02.625Z] Iniciando envio híbrido {"host":"www662.your-server.de","to":"moacir@goldofir.me","provider":"Generic SMTP"}
+[2026-04-21T19:29:08.968Z] Sucesso SMTP: {"messageId":"<0c4c70ce-44d4-68a0-3919-a99943b0af01@thiga.com.br>","response":"250 OK id=1wFGmc-0005NM-1x"}
+[2026-04-21T19:31:53.099Z] Iniciando envio híbrido {"host":"www662.your-server.de","to":"contato@agenciainnova.com.br","provider":"Generic SMTP"}
+[2026-04-21T19:31:59.119Z] Sucesso SMTP: {"messageId":"<16ba8473-93f5-8949-9da0-057f835356ba@thiga.com.br>","response":"250 OK id=1wFGpM-0006Wq-2d"}
+[2026-04-21T19:37:05.021Z] Iniciando envio híbrido {"host":"www662.your-server.de","to":"moacir@goldofir.me","provider":"Generic SMTP"}
+[2026-04-21T19:37:10.884Z] Sucesso SMTP: {"messageId":"<3ba24d70-7582-bce5-0480-4f8155feabd2@thiga.com.br>","response":"250 OK id=1wFGuO-0007KG-1l"}
+[2026-04-21T19:38:43.006Z] Iniciando envio híbrido {"host":"www662.your-server.de","to":"moacir@goldofir.me","provider":"Generic SMTP"}
+[2026-04-21T19:38:48.784Z] Sucesso SMTP: {"messageId":"<79d8ad0f-14e5-6ce2-03ce-17ad66de18fb@thiga.com.br>","response":"250 OK id=1wFGvy-0007cF-1P"}
