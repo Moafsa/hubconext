@@ -481,6 +481,7 @@ export async function generateContract(projectData: {
   agencyCnpj?: string;
   agencyLegalName?: string;
   agencyPhone?: string;
+  responsiblePhone?: string;
   agencyAddress?: string;
   agencyResponsibleName?: string;
   suggestedTech?: string;
@@ -497,7 +498,7 @@ export async function generateContract(projectData: {
   const agencyLegalName = projectData.agencyLegalName || agencyDisplayName;
   const cnpj = projectData.agencyCnpj || "00.000.000/0000-00";
   const agencyAddress = projectData.agencyAddress || "Endereço Completo";
-  const agencyPhone = projectData.agencyPhone || "(00) 00000-0000";
+  const agencyPhone = projectData.agencyPhone || projectData.responsiblePhone || "(00) 00000-0000";
   const responsible = projectData.agencyResponsibleName || "A DEFINIR";
 
   const totalValue = projectData.agreedPrice ?? projectData.proposedPrice;

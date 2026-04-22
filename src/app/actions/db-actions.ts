@@ -400,6 +400,7 @@ export async function approveProject(projectId: string, userName: string) {
       agencyCnpj: project.agency?.cnpj,
       agencyLegalName: (project.agency as any)?.legalName,
       agencyPhone: (project.agency as any)?.phone,
+      responsiblePhone: (project.agency as any)?.responsiblePhone,
       agencyResponsibleName: (project.agency as any)?.responsibleName,
       agencyAddress: [
         (project.agency as any)?.addressLine,
@@ -607,6 +608,7 @@ export async function syncProjectFromChat(projectId: string, userName: string) {
       agencyCnpj: project.agency?.cnpj,
       agencyLegalName: (project.agency as any)?.legalName,
       agencyPhone: (project.agency as any)?.phone,
+      responsiblePhone: (project.agency as any)?.responsiblePhone,
       agencyResponsibleName: (project.agency as any)?.responsibleName,
       agencyAddress: [
         (project.agency as any)?.addressLine,
