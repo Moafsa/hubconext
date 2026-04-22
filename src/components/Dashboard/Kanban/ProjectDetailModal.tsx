@@ -436,7 +436,7 @@ export function ProjectDetailModal({ project, onClose, onUpdate, currentUserId, 
                {isCopied ? "Link Copiado!" : "Compartilhar Portal"}
              </button>
 
-             {(userRole?.toUpperCase() === 'CONEXT_ADMIN' || isAgencyAdmin) && (
+             {userRole?.toUpperCase() === 'CONEXT_ADMIN' && (
                <button 
                  onClick={handleSyncFromChat}
                  disabled={isSyncing}
