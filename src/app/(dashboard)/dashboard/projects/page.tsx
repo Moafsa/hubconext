@@ -54,7 +54,7 @@ function ProjectsContent() {
           <p className="text-slate-500 font-medium text-sm">Gerencie o fluxo completo, desde o briefing via IA até a entrega final.</p>
         </div>
         
-        {role === "AGENCY_USER" && (
+        {(role === "AGENCY_USER" || role === "AGENCY_ADMIN") && (
           <button 
             onClick={() => setIsWizardOpen(true)}
             className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-2xl font-black hover:bg-black transition-all shadow-xl shadow-slate-200"

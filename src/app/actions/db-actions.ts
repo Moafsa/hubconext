@@ -338,7 +338,7 @@ export async function getProjectInfo(projectId: string) {
  */
 export async function updateProjectAIContent(
   projectId: string, 
-  data: { technicalScope?: string, contractText?: string },
+  data: { technicalScope?: string, contractText?: string, description?: string },
   userId: string,
   userName: string
 ) {
@@ -346,12 +346,15 @@ export async function updateProjectAIContent(
     const { user } = await requireProjectAccess(projectId);
     const isAdmin = user.role === "CONEXT_ADMIN";
 
-    const payload: { technicalScope?: string; contractText?: string } = {};
+    const payload: { technicalScope?: string; contractText?: string, description?: string } = {};
     if (typeof data.technicalScope === "string") payload.technicalScope = data.technicalScope;
+    if (typeof data.description === "string") payload.description = data.description;
+    
     if (isAdmin && typeof data.contractText === "string") payload.contractText = data.contractText;
     if (!isAdmin && data.contractText !== undefined) {
       throw new Error("Apenas administradores podem editar o contrato.");
     }
+    
     if (Object.keys(payload).length === 0) {
       throw new Error("Nada para salvar.");
     }
@@ -364,6 +367,7 @@ export async function updateProjectAIContent(
     const fields = [];
     if (payload.technicalScope !== undefined) fields.push("Escopo Técnico");
     if (payload.contractText !== undefined) fields.push("Contrato");
+    if (payload.description !== undefined) fields.push("Contexto da Agência");
 
     const who = isAdmin ? "Admin" : "Agência";
     await addProjectHistory(

@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import nodemailer from "nodemailer";
 import { promises as dns } from "dns";
+import net from "net";
 
 export interface MailConfig {
   host: string;
@@ -55,6 +56,12 @@ export class MailService {
           user: config.user,
           pass: config.pass
         },
+        // Evita timeout quando o host resolve primeiro para IPv6 em ambientes Docker sem egress IPv6
+        family: 4,
+        // Timeouts mais curtos para não travar o painel em caso de rede bloqueada
+        connectionTimeout: 12_000,
+        greetingTimeout: 12_000,
+        socketTimeout: 20_000,
         tls: {
           rejectUnauthorized: false
         }

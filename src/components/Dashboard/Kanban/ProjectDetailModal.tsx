@@ -97,8 +97,10 @@ export function ProjectDetailModal({ project, onClose, onUpdate, currentUserId, 
   // Estados de Edição (Admin)
   const [isEditingScope, setIsEditingScope] = useState(false);
   const [isEditingContract, setIsEditingContract] = useState(false);
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [editScope, setEditScope] = useState(project.technicalScope || "");
   const [editContract, setEditContract] = useState(project.contractText || "");
+  const [editDescription, setEditDescription] = useState(project.description || "");
 
   const [materialLinkInput, setMaterialLinkInput] = useState("");
   const [materialLinks, setMaterialLinks] = useState<string[]>([]);
@@ -119,13 +121,31 @@ export function ProjectDetailModal({ project, onClose, onUpdate, currentUserId, 
   const briefing = getSafeBriefing(project.briefing);
   const hasAcceptedContract = Boolean((briefing as any)?.agencyAcceptedContractAt);
 
+  // Helper para extração resiliente de dados do briefing (suporta flat e nested da IA)
+  const getNested = (obj: any, path: string) => {
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  };
+
+  const projectSummary = briefing?.projectSummary || {};
+  const displayDescription = projectSummary.description || briefing?.description || project.description || "";
+  const displayObjective = projectSummary.objective || briefing?.objective || "";
+  
+  const rawFuncs = briefing?.requirements?.functional || briefing?.scope?.inScope || briefing?.functionalities;
+  const displayFunctionalities = Array.isArray(rawFuncs) ? rawFuncs.join('\n') : (rawFuncs || "");
+  
+  const rawInts = briefing?.integrations?.systems || briefing?.integrations;
+  const displayIntegrations = Array.isArray(rawInts) ? rawInts.join('\n') : (rawInts || "");
+  
+  const displayReferences = briefing?.contentAndBrand?.references || briefing?.references || [];
+
   useEffect(() => {
     setEditScope(project.technicalScope || "");
     setEditContract(project.contractText || "");
+    setEditDescription(project.description || "");
     const b = getSafeBriefing(project.briefing);
     const raw = b?.agencyMaterialLinks;
     setMaterialLinks(Array.isArray(raw) ? raw.filter((x: unknown) => typeof x === "string") as string[] : []);
-  }, [project.id, project.technicalScope, project.contractText, project.briefing]);
+  }, [project.id, project.technicalScope, project.contractText, project.briefing, project.description]);
 
   // Marcos de entrega (Milestones)
   type Milestone = { id: string; label: string; date: string; done: boolean };
@@ -525,15 +545,67 @@ export function ProjectDetailModal({ project, onClose, onUpdate, currentUserId, 
                   )}
               </div>
 
-               <div className="space-y-4">
-                 <div className="flex items-center gap-2">
-                    <Layout className="w-4 h-4 text-slate-400" />
-                    <h3 className="font-black text-slate-800 text-sm">Escopo da Agência (Contexto)</h3>
-                 </div>
-                 <p className="text-slate-600 leading-relaxed bg-slate-50/50 p-6 rounded-[24px] border border-slate-100 italic text-sm">
-                   "{project.description || "Nenhuma descrição curta fornecida."}"
-                 </p>
-               </div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                       <Layout className="w-4 h-4 text-slate-400" />
+                       <h3 className="font-black text-slate-800 text-sm">Escopo da Agência (Contexto)</h3>
+                    </div>
+                    {isAgencyStaff && !isEditingDescription && (
+                      <button 
+                        onClick={() => setIsEditingDescription(true)} 
+                        className="text-slate-400 hover:text-blue-600 transition-colors p-1"
+                        title="Editar Contexto"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {isEditingDescription ? (
+                    <div className="space-y-3">
+                      <textarea
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                        className="w-full bg-white border-2 border-blue-100 rounded-[24px] p-6 text-sm font-medium text-slate-700 min-h-[120px] focus:border-blue-300 focus:ring-0 transition-all outline-none"
+                        placeholder="Descreva o contexto do projeto..."
+                      />
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => {
+                            setIsEditingDescription(false);
+                            setEditDescription(project.description || "");
+                          }}
+                          className="px-4 py-2 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          disabled={isSubmitting}
+                          onClick={async () => {
+                            setIsSubmitting(true);
+                            const res = await updateProjectAIContent(project.id, { description: editDescription }, currentUserId, userName);
+                            setIsSubmitting(false);
+                            if (res.success) {
+                              setIsEditingDescription(false);
+                              onUpdate();
+                            } else {
+                              alert("Erro ao salvar: " + res.error);
+                            }
+                          }}
+                          className="bg-blue-600 text-white px-4 py-2 rounded-full text-xs font-black flex items-center gap-2 hover:bg-blue-700 transition-all shadow-md active:scale-95 disabled:opacity-50"
+                        >
+                          {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                          Salvar Alteração
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-slate-600 leading-relaxed bg-slate-50/50 p-6 rounded-[24px] border border-slate-100 italic text-sm">
+                      "{displayDescription || "Nenhuma descrição curta fornecida."}"
+                    </p>
+                  )}
+                </div>
 
                {/* Briefing Estratégico */}
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -541,32 +613,32 @@ export function ProjectDetailModal({ project, onClose, onUpdate, currentUserId, 
                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                         <Target className="w-3 h-3" /> Objetivo Central
                      </h4>
-                     <p className="text-xs font-bold text-slate-700 leading-relaxed">
-                        {briefing?.objective || "Não informado"}
-                     </p>
+                      <p className="text-xs font-bold text-slate-700 leading-relaxed">
+                        {displayObjective || "Não informado"}
+                      </p>
                   </div>
                   <div className="bg-slate-50 p-5 rounded-[24px] border border-slate-100">
                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                         <Zap className="w-3 h-3 text-amber-500" /> Funcionalidades Core
                      </h4>
-                     <p className="text-xs font-bold text-slate-700 leading-relaxed">
-                        {briefing?.functionalities || "Não informado"}
-                     </p>
+                      <p className="text-xs font-bold text-slate-700 leading-relaxed whitespace-pre-wrap">
+                        {displayFunctionalities || "Não informado"}
+                      </p>
                   </div>
                   <div className="bg-slate-50 p-5 rounded-[24px] border border-slate-100">
                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                         <LinkIcon className="w-3 h-3 text-blue-500" /> Integrações
                      </h4>
-                     <p className="text-xs font-bold text-slate-700 leading-relaxed">
-                        {briefing?.integrations || "Nenhuma informada"}
-                     </p>
+                      <p className="text-xs font-bold text-slate-700 leading-relaxed whitespace-pre-wrap">
+                        {displayIntegrations || "Nenhuma informada"}
+                      </p>
                   </div>
                   <div className="bg-slate-50 p-5 rounded-[24px] border border-slate-100 md:col-span-2">
                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                         <Globe className="w-3 h-3 text-emerald-500" /> Links de Referência
                      </h4>
-                     <div className="flex flex-wrap gap-2">
-                        {briefing?.references?.map((ref: string, i: number) => (
+                      <div className="flex flex-wrap gap-2">
+                        {displayReferences?.map((ref: string, i: number) => (
                            ref ? (
                              <a 
                                key={i} 
@@ -578,10 +650,10 @@ export function ProjectDetailModal({ project, onClose, onUpdate, currentUserId, 
                              </a>
                            ) : null
                         ))}
-                        {(!briefing?.references || briefing.references.filter((r:string)=>r).length === 0) && (
+                        {(!displayReferences || displayReferences.filter((r:string)=>r).length === 0) && (
                            <span className="text-[10px] text-slate-400 font-bold italic">Nenhum link fornecido</span>
                         )}
-                     </div>
+                      </div>
                      {Array.isArray(briefing?.agencyMaterialLinks) && briefing.agencyMaterialLinks.filter(Boolean).length > 0 && (
                        <div className="mt-4 pt-4 border-t border-slate-200">
                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Materiais extras (agência)</p>
