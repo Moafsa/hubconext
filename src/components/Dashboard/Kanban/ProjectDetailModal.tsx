@@ -68,7 +68,8 @@ interface ProjectDetailModalProps {
 }
 
 export function ProjectDetailModal({ project, onClose, onUpdate, currentUserId, userRole, userName = "Usuário" }: ProjectDetailModalProps) {
-  const isAgencyStaff = userRole === "AGENCY_USER" || userRole === "AGENCY_ADMIN";
+  const isAgencyStaff = userRole?.toUpperCase() === "AGENCY_USER" || userRole?.toUpperCase() === "AGENCY_ADMIN";
+  const isAgencyAdmin = userRole?.toUpperCase() === "AGENCY_ADMIN";
   const [activeTab, setActiveTab] = useState<"briefing" | "milestones" | "timeline" | "chat" | "finance">("briefing");
   const [commentText, setCommentText] = useState("");
   const [isPublicComment, setIsPublicComment] = useState(true);
@@ -127,7 +128,7 @@ export function ProjectDetailModal({ project, onClose, onUpdate, currentUserId, 
   };
 
   const projectSummary = briefing?.projectSummary || {};
-  const displayDescription = projectSummary.description || briefing?.description || project.description || "";
+  const displayDescription = project.description || projectSummary.description || briefing?.description || "";
   const displayObjective = projectSummary.objective || briefing?.objective || "";
   
   const rawFuncs = briefing?.requirements?.functional || briefing?.scope?.inScope || briefing?.functionalities;
@@ -136,7 +137,8 @@ export function ProjectDetailModal({ project, onClose, onUpdate, currentUserId, 
   const rawInts = briefing?.integrations?.systems || briefing?.integrations;
   const displayIntegrations = Array.isArray(rawInts) ? rawInts.join('\n') : (rawInts || "");
   
-  const displayReferences = briefing?.contentAndBrand?.references || briefing?.references || [];
+  const rawRefs = briefing?.contentAndBrand?.references || briefing?.references || [];
+  const displayReferences = Array.isArray(rawRefs) ? rawRefs : (typeof rawRefs === 'string' ? [rawRefs] : []);
 
   useEffect(() => {
     setEditScope(project.technicalScope || "");
@@ -434,12 +436,12 @@ export function ProjectDetailModal({ project, onClose, onUpdate, currentUserId, 
                {isCopied ? "Link Copiado!" : "Compartilhar Portal"}
              </button>
 
-             {userRole === 'CONEXT_ADMIN' && (
+             {(userRole?.toUpperCase() === 'CONEXT_ADMIN' || isAgencyAdmin) && (
                <button 
                  onClick={handleSyncFromChat}
                  disabled={isSyncing}
                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50"
-                 title="Sincronizar Brieling/Contrato com base no Chat"
+                 title="Sincronizar Briefing/Contrato com base no Chat e Contexto"
                >
                  {isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                  {isSyncing ? "Sincronizando..." : "Sincronizar via IA"}
