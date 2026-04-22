@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { analyzeChatAndUpdateContent, generateContract } from "./ai-actions";
 import { deleteObjectByKey } from "./upload-actions";
 import { prisma } from "@/lib/prisma";
+import { NotificationService } from "@/services/notification-service";
 
 /** Garante que o usuário logado pode acessar o projeto (admin global ou usuário da mesma agência). */
 async function requireProjectAccess(projectId: string) {
@@ -52,7 +53,9 @@ export async function updateGlobalConfig(data: {
   smtpPass?: string,
   smtpFrom?: string,
   uzapiInstanceId?: string,
-  uzapiToken?: string
+  uzapiToken?: string,
+  adminNotificationEmail?: string,
+  adminNotificationPhone?: string
 }) {
   try {
     const config = await prisma.systemConfig.upsert({
@@ -292,6 +295,20 @@ export async function createProject(data: any) {
     }
 
     revalidatePath("/dashboard/projects");
+
+    // 5. Notificar Admin
+    try {
+      const projectWithAgency = await prisma.project.findUnique({
+        where: { id: project.id },
+        include: { agency: true }
+      });
+      if (projectWithAgency) {
+        await NotificationService.notifyAdminInstant('PROJECT_CREATED', projectWithAgency);
+      }
+    } catch (nErr) {
+      console.error("Erro ao notificar admin na criação:", nErr);
+    }
+
     return { success: true, id: project.id };
   } catch (error: any) {
     console.error("[createProject] ERRO CRÍTICO NA GRAVAÇÃO:", error);
@@ -377,6 +394,20 @@ export async function updateProjectAIContent(
     );
 
     revalidatePath("/dashboard/projects");
+
+    // Notificar Admin
+    try {
+      const projectWithAgency = await prisma.project.findUnique({
+        where: { id: projectId },
+        include: { agency: true }
+      });
+      if (projectWithAgency) {
+        await NotificationService.notifyAdminInstant('PROJECT_MODIFIED', projectWithAgency, `${who} (${userName}) alterou: ${fields.join(" e ")}.`);
+      }
+    } catch (nErr) {
+      console.error("Erro ao notificar admin na modificação:", nErr);
+    }
+
     return { success: true, project };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -635,6 +666,20 @@ export async function syncProjectFromChat(projectId: string, userName: string) {
 
     await addProjectHistory(projectId, "Sincronização IA", `Sincronizado por ${userName}. Escopo e Contrato atualizados via IA.`);
     revalidatePath("/dashboard/projects");
+
+    // Notificar Admin
+    try {
+      const projectWithAgency = await prisma.project.findUnique({
+        where: { id: projectId },
+        include: { agency: true }
+      });
+      if (projectWithAgency) {
+        await NotificationService.notifyAdminInstant('PROJECT_MODIFIED', projectWithAgency, `Sincronizado via IA por ${userName}.`);
+      }
+    } catch (nErr) {
+      console.error("Erro ao notificar admin na sincronização:", nErr);
+    }
+
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -724,6 +769,20 @@ export async function addProjectComment(
     // Revalidar caminhos para garantir que o chat atualize
     revalidatePath(`/p/${projectId}`);
     revalidatePath("/dashboard/projects");
+
+    // Enfileirar Notificação para Admin (Batch de 1h)
+    try {
+      const author = clientAuthorName || "Usuário Externo";
+      // Se tiver userId, buscar nome do usuário para o log
+      let finalAuthor = author;
+      if (userId) {
+        const u = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+        if (u) finalAuthor = u.name;
+      }
+      await NotificationService.queueCommentNotification(projectId, text, finalAuthor);
+    } catch (nErr) {
+      console.error("Erro ao enfileirar notificação de chat:", nErr);
+    }
 
     return { success: true, comment };
   } catch (error: any) {
@@ -1124,6 +1183,7 @@ export async function testSmtpConnection(agencyId: string, config: {
  */
 import { MailService } from "@/services/mail";
 import { WhatsAppService } from "@/services/whatsapp";
+import { NotificationService } from "@/services/notification-service";
 import { createClientSession } from "@/lib/client-auth";
 
 async function refreshAgencyUzapiTokenIfNeeded(agencyId: string) {

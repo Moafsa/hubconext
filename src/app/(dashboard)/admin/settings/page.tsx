@@ -43,6 +43,10 @@ export default function AdminSettingsPage() {
     smtpUser: "",
     smtpPass: "",
     smtpFrom: "",
+    uzapiInstanceId: "",
+    uzapiToken: "",
+    adminNotificationEmail: "",
+    adminNotificationPhone: "",
   });
 
   // WhatsApp
@@ -65,6 +69,10 @@ export default function AdminSettingsPage() {
           smtpUser: data.smtpUser || "",
           smtpPass: data.smtpPass || "",
           smtpFrom: data.smtpFrom || "",
+          uzapiInstanceId: data.uzapiInstanceId || "",
+          uzapiToken: data.uzapiToken || "",
+          adminNotificationEmail: (data as any).adminNotificationEmail || "",
+          adminNotificationPhone: (data as any).adminNotificationPhone || "",
         });
 
         if (data.uzapiToken) {
@@ -415,6 +423,40 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Card: Notificações do Administrador */}
+        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+          <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex items-center gap-4">
+             <div className="w-12 h-12 bg-rose-600 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-200">
+                <Mail className="w-6 h-6 text-white" />
+             </div>
+             <div>
+                <h3 className="font-black text-slate-800 tracking-tight text-lg">Notificações do Administrador</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Receba alertas de novos projetos e mensagens</p>
+             </div>
+          </div>
+          
+          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">E-mail para Alertas</label>
+               <input 
+                 className="w-full bg-slate-50 border-slate-200 rounded-2xl px-5 py-4 text-sm font-bold focus:bg-white transition-all shadow-inner"
+                 placeholder="admin@conext.click"
+                 value={(config as any).adminNotificationEmail}
+                 onChange={e => setConfig({...config, adminNotificationEmail: e.target.value} as any)}
+               />
+            </div>
+            <div className="space-y-2">
+               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">WhatsApp para Alertas (com DDI)</label>
+               <input 
+                 className="w-full bg-slate-50 border-slate-200 rounded-2xl px-5 py-4 text-sm font-bold focus:bg-white transition-all shadow-inner"
+                 placeholder="5511999999999"
+                 value={(config as any).adminNotificationPhone}
+                 onChange={e => setConfig({...config, adminNotificationPhone: e.target.value} as any)}
+               />
+            </div>
           </div>
         </div>
 

@@ -97,6 +97,7 @@ model Project {
   comments        Comment[]
   files           File[]
   payments        Payment[]
+  notificationQueues NotificationQueue[]
   agency          Agency            @relation(fields: [agencyId], references: [id])
   client          Client            @relation(fields: [clientId], references: [id])
   histories       ProjectHistory[]
@@ -173,6 +174,25 @@ model SystemConfig {
   smtpFrom        String?
   uzapiInstanceId String?
   uzapiToken      String?
+
+  // Configurações de Notificação Admin
+  adminNotificationEmail String?
+  adminNotificationPhone String?
+}
+
+model NotificationQueue {
+  id           String    @id @default(cuid())
+  type         String    // 'COMMENT', 'PROJECT_CREATED', 'PROJECT_MODIFIED'
+  projectId    String
+  content      String
+  metadata     Json?
+  status       String    @default("PENDING") // 'PENDING', 'SENT', 'FAILED'
+  scheduledFor DateTime
+  createdAt    DateTime  @default(now())
+  sentAt       DateTime?
+  project      Project   @relation(fields: [projectId], references: [id])
+
+  @@index([status, scheduledFor])
 }
 
 enum Role {
