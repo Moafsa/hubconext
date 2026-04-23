@@ -7,6 +7,8 @@ import { authOptions } from "@/lib/auth";
 import { analyzeChatAndUpdateContent, generateContract } from "./ai-actions";
 import { deleteObjectByKey } from "./upload-actions";
 import { prisma } from "@/lib/prisma";
+import { MailService } from "@/services/mail";
+import { WhatsAppService } from "@/services/whatsapp";
 import { NotificationService } from "@/services/notification-service";
 
 /** Garante que o usuário logado pode acessar o projeto (admin global ou usuário da mesma agência). */
@@ -1181,9 +1183,6 @@ export async function testSmtpConnection(agencyId: string, config: {
 /**
  * CLIENT PORTAL AUTH & OTP ACTIONS
  */
-import { MailService } from "@/services/mail";
-import { WhatsAppService } from "@/services/whatsapp";
-import { NotificationService } from "@/services/notification-service";
 import { createClientSession } from "@/lib/client-auth";
 
 async function refreshAgencyUzapiTokenIfNeeded(agencyId: string) {
